@@ -1,0 +1,50 @@
+---
+title: "Get posts data from https://talk.observablehq.com"
+---
+
+```{r}
+library(rjson)
+library(RCurl)
+library(dplyr)
+library(glue)
+
+getPosts <- function(json_url) {
+  rawdata <- getURL(json_url)
+  json <- fromJSON(rawdata)
+  df <- lapply(json$latest_posts, function(post) # Loop through each "post"
+    {
+      # Convert each group to a data frame.
+      data.frame(post_id = post$id, user = post$username, date = post$created_at, is_answer = post$accepted_answer)
+    })
+  # Now you have a list of data frames, connect them together in
+  # one single dataframe
+  df <- do.call(rbind, df)
+  df
+}
+
+posts <- getPosts("https://talk.observablehq.com/posts.json")
+last_post_id <- tail(posts,1)$post_id
+before_post_id <- last_post_id - 1
+idx <- 0
+step <- 10
+maxLoops <- 1000
+
+while (before_post_id >= 0 & idx < maxLoops) {
+  Sys.sleep(0.1)
+  print(before_post_id)
+  idx <- idx + 1
+  new_posts <- getPosts(glue("https://talk.observablehq.com/posts.json?before=", before_post_id))
+  posts <- rbind(posts, new_posts)
+  last_post_id <- tail(posts,1)$post_id
+  if (last_post_id <= before_post_id) {
+    before_post_id <- last_post_id - 1
+  } else {
+    before_post_id <- before_post_id - step
+  }
+}
+
+write.csv(
+  data.frame(lapply(posts, as.character), stringsAsFactors=FALSE),
+  file = "posts.csv",
+  row.names=FALSE)
+```
