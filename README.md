@@ -1,6 +1,6 @@
 # README
 
-All posts on https://talk.observablehq.com Discourse instance.
+All posts on the https://talk.observablehq.com Discourse instance.
 
 Used in the [Top posters on ObservableHQ forum](https://observablehq.com/@severo/top-posters-on-observablehq-forum) bar chart race data visualization.
 
