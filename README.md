@@ -1,6 +1,6 @@
 # README
 
-All posts on https://talk.observablehq.com Discourse instance. R script using jsonlite, dplyr, glue.
+All posts on https://talk.observablehq.com Discourse instance.
 
 Used in the [Top posters on ObservableHQ forum](https://observablehq.com/@severo/top-posters-on-observablehq-forum) bar chart race data visualization.
 
@@ -37,3 +37,5 @@ To update the [posts.csv](./posts.csv) file, launch the R script (it takes about
 ```bash
 Rscript get_data_from_talk_observable.R
 ```
+
+The R script uses jsonlite, dplyr and glue.
