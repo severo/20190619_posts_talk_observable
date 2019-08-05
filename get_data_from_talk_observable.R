@@ -1,24 +1,17 @@
----
-title: "Get posts data from https://talk.observablehq.com"
----
-
-```{r}
-library(rjson)
-library(RCurl)
+# Get posts data from https://talk.observablehq.com
+library(jsonlite)
 library(dplyr)
 library(glue)
 
 getPosts <- function(json_url) {
-  rawdata <- getURL(json_url)
-  json <- fromJSON(rawdata)
-  df <- lapply(json$latest_posts, function(post) # Loop through each "post"
-    {
-      # Convert each group to a data frame.
-      data.frame(post_id = post$id, user = post$username, date = post$created_at, is_answer = post$accepted_answer)
-    })
-  # Now you have a list of data frames, connect them together in
-  # one single dataframe
-  df <- do.call(rbind, df)
+  json <- fromJSON(json_url)
+  if (length(json$latest_posts) > 0) {
+    df <- json$latest_posts %>%
+      select(post_id = id, user = username, date = created_at, is_accepted_answer = accepted_answer)
+  } else {
+    df <- data.frame(post_id="1", user="user", date="2019", is_answer=FALSE)
+    df <- df[FALSE,]
+  }
   df
 }
 
@@ -47,4 +40,3 @@ write.csv(
   data.frame(lapply(posts, as.character), stringsAsFactors=FALSE),
   file = "posts.csv",
   row.names=FALSE)
-```
